@@ -444,7 +444,7 @@ def _match_date(data):
         size : 20 is the default sample size of the dataset. Set to the rowsize of the
         dataset when the rowsize of the dataset is less than 20.
     '''
-    if data.shape[0] >= 20:
+    if (data.shape[0]) >= 20:
         size = 20
     else:
         size = data.shape[0]
