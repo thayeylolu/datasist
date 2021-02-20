@@ -13,8 +13,6 @@ from IPython.display import display
 from collections import Counter
 
 
-
-
 def describe(data=None, name='', date_cols=None, show_categories=False, plot_missing=False):
     '''
     Calculates statistics and information about a data set. Information displayed are
@@ -47,14 +45,14 @@ def describe(data=None, name='', date_cols=None, show_categories=False, plot_mis
     -------
         None
     '''
-    
+
     if data is None:
         raise ValueError("data: Expecting a DataFrame or Series, got 'None'")
 
-    ## Get categorical features
+    # Get categorical features
     cat_features = get_cat_feats(data)
-    
-    #Get numerical features
+
+    # Get numerical features
     num_features = get_num_feats(data)
 
     print('First five data points')
@@ -82,7 +80,8 @@ def describe(data=None, name='', date_cols=None, show_categories=False, plot_mis
 
     date_cols = get_date_cols(data)
     if len(date_cols) is not 0:
-        print("Column(s) {} should be in Datetime format. Use the [to_date] function in datasist.feature_engineering to convert to Pandas Datetime format".format(date_cols))
+        print("Column(s) {} should be in Datetime format. Use the [to_date] function in datasist.feature_engineering to convert to Pandas Datetime format".format(
+            date_cols))
         _space()
 
     print('Numerical Features in Data set')
@@ -96,17 +95,17 @@ def describe(data=None, name='', date_cols=None, show_categories=False, plot_mis
     print('Statistical Description of Columns')
     display(data.describe())
     _space()
-    
+
     print('Description of Categorical Features')
     if cat_features != None:
         display(data.describe(include=[np.object, pd.Categorical]).T)
         _space()
-          
+
     print('Unique class Count of Categorical features')
     display(get_unique_counts(data))
     _space()
 
-    if show_categories:     
+    if show_categories:
         print('Classes in Categorical Columns')
         print("-"*30)
         class_count(data, cat_features)
@@ -115,10 +114,9 @@ def describe(data=None, name='', date_cols=None, show_categories=False, plot_mis
     print('Missing Values in Data')
     display(display_missing(data))
 
-    #Plots the missing values
+    # Plots the missing values
     if plot_missing:
         plot_missing(data)
-
 
 
 def get_cat_feats(data=None):
@@ -163,7 +161,6 @@ def get_num_feats(data=None):
     return list(num_features)
 
 
-
 def get_date_cols(data=None):
     '''
     Returns the Datetime columns in a data set.
@@ -187,13 +184,12 @@ def get_date_cols(data=None):
     if data is None:
         raise ValueError("data: Expecting a DataFrame or Series, got 'None'")
 
-    #Get existing date columns in pandas Datetime64 format
+    # Get existing date columns in pandas Datetime64 format
     date_cols = set(data.dtypes[data.dtypes == 'datetime64[ns, UTC]'].index)
-    #infer Date columns 
+    # infer Date columns
     date_cols = date_cols.union(_match_date(data))
-       
-    return date_cols
 
+    return date_cols
 
 
 def get_unique_counts(data=None):
@@ -209,7 +205,7 @@ def get_unique_counts(data=None):
         DataFrame or Series
 
             Unique value counts of the features in a dataset.
-    
+
     '''
 
     if data is None:
@@ -220,7 +216,7 @@ def get_unique_counts(data=None):
 
     for feature in features:
         temp_len.append(len(data[feature].unique()))
-        
+
     df = list(zip(features, temp_len))
     df = pd.DataFrame(df, columns=['Feature', 'Unique Count'])
     df = df.style.bar(subset=['Unique Count'], align='mid')
@@ -238,7 +234,7 @@ def display_missing(data=None, plot=False):
         plot: bool, Default False
 
             Plots missing values in dataset as a heatmap
-    
+
     Returns
     -------
         Matplotlib Figure:
@@ -261,9 +257,6 @@ def display_missing(data=None, plot=False):
         return df
     else:
         return df
-
-
-
 
 
 def cat_summarizer(data, x=None, y=None, hue=None, palette='Set1', verbose=True):
@@ -305,7 +298,7 @@ def cat_summarizer(data, x=None, y=None, hue=None, palette='Set1', verbose=True)
 
     sns.countplot(x=x, y=y, hue=hue, data=data, palette=palette)
     plt.show()
-    
+
 
 def join_train_and_test(data_train=None, data_test=None):
     '''
@@ -321,7 +314,7 @@ def join_train_and_test(data_train=None, data_test=None):
         data_test: DataFrame, named series.
 
             Second data set to join, usually called test.
-    
+
     Returns:
     -------
         Tuple: Merged data, size of train and size of test
@@ -329,8 +322,9 @@ def join_train_and_test(data_train=None, data_test=None):
 
     n_train = data_train.shape[0]
     n_test = data_test.shape[0]
-    all_data = pd.concat([data_train, data_test],sort=False).reset_index(drop=True)
-    
+    all_data = pd.concat([data_train, data_test],
+                         sort=False).reset_index(drop=True)
+
     return all_data, n_train, n_test
 
 
@@ -343,7 +337,7 @@ def detect_outliers(data, n, features):
             data: DataFrame or named Series
 
             n: the bench mark for the number of allowable outliers in the columns.
-            
+
             features: Specific columns you want to check for outliers and it accepts only numerical values.
 
         Returns
@@ -352,10 +346,12 @@ def detect_outliers(data, n, features):
         '''
 
     if data is None:
-        raise ValueError("data: Expecting a DataFrame/ numpy2d array, got 'None'")
+        raise ValueError(
+            "data: Expecting a DataFrame/ numpy2d array, got 'None'")
 
     if features is None:
-        raise ValueError("columns: Expecting features i.e columns of the dataset but got 'None'")
+        raise ValueError(
+            "columns: Expecting features i.e columns of the dataset but got 'None'")
 
     if n is None:
         n = 2
@@ -375,7 +371,8 @@ def detect_outliers(data, n, features):
         outlier_step = 1.5 * IQR
 
         # Determine a list of indices of outliers for feature col
-        outlier_list_col = data[(data[col] < Q1 - outlier_step) | (data[col] > Q3 + outlier_step)].index
+        outlier_list_col = data[(data[col] < Q1 - outlier_step)
+                                | (data[col] > Q3 + outlier_step)].index
 
         # append the found outlier indices for col to the list of outlier indices
         outlier_indices.extend(outlier_list_col)
@@ -391,7 +388,7 @@ def check_train_test_set(train_data, test_data, index=None, col=None):
     '''
     Checks the distribution of train and test for uniqueness in order to determine
     the best feature engineering strategy.
-    
+
     Parameters:
     -------------------
         train_data: DataFrame
@@ -399,30 +396,32 @@ def check_train_test_set(train_data, test_data, index=None, col=None):
             The first data set to join
 
         test_data: DataFrame
-             
+
              The second dataset to join
 
         index: Str, Default None
 
             An index column present in both dataset to be used in plotting
-        
+
         col: Str, Default None
 
             A feature present in both dataset used in plotting
 
-    
+
     '''
-    print('There are {} training rows and {} test rows.'.format(train_data.shape[0], test_data.shape[0]))
-    print('There are {} training columns and {} test columns.'.format(train_data.shape[1], test_data.shape[1]))
-    
+    print('There are {} training rows and {} test rows.'.format(
+        train_data.shape[0], test_data.shape[0]))
+    print('There are {} training columns and {} test columns.'.format(
+        train_data.shape[1], test_data.shape[1]))
+
     if index:
         if train_data[index].nunique() == train_data.shape[0]:
             print('Id field is unique.')
         else:
             print('Id field is not unique')
 
-        if len(np.intersect1d(train_data[index].values, test_data[index].values))== 0:
-            print('Train and test sets have distinct Ids.') 
+        if len(np.intersect1d(train_data[index].values, test_data[index].values)) == 0:
+            print('Train and test sets have distinct Ids.')
         else:
             print('Train and test sets IDs are the same.')
             _space()
@@ -433,27 +432,34 @@ def check_train_test_set(train_data, test_data, index=None, col=None):
         plt.legend(loc=0)
         plt.ylabel('number of records')
         plt.show()
-        
-    
+
+
 def _space():
     print('\n')
 
-        
 
 def _match_date(data):
     '''
         Return a list of columns that matches the DateTime expression
+        size : 20 is the default sample size of the dataset. Set to the rowsize of the
+        dataset when the rowsize of the dataset is less than 20.
     '''
-    mask = data.sample(20).astype(str).apply(lambda x : x.str.match(r'(\d{2,4}-\d{2}-\d{2,4})+').all())
+    if data.shape[0] >= 20:
+        size = 20
+    else:
+        size = data.shape[0]
+    mask = data.sample(size).astype(str).apply(
+        lambda x: x.str.match(r'(\d{2,4}-\d{2}-\d{2,4})+').all())
     return set(data.loc[:, mask].columns)
 
 
-def display_rows(data,num=2):
+def display_rows(data, num=2):
     '''
     Displays the required number of rows
-    
+
     '''
     if data is None:
-        raise ValueError("data: Expecting a DataFrame/ numpy2d array, got 'None'")
+        raise ValueError(
+            "data: Expecting a DataFrame/ numpy2d array, got 'None'")
 
     return data.head(num)
